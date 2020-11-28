@@ -1,9 +1,15 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import productsRoutes from './routes/products.js'
+import homeRoutes from './routes/home.js'
 
+dotenv.config() // to access environment variables from .env file
 const app = express()
-dotenv.config()
 
-const PORT = process.env.PORT
+// routes
+app.use('/', homeRoutes)
+app.use('/api/products', productsRoutes)
 
-app.listen(PORT, console.log(`Server running on port ${PORT}`))
+const PORT = process.env.PORT || 5000
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
