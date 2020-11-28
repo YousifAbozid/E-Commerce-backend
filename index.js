@@ -1,10 +1,12 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import cors from 'cors'
 import productsRoutes from './routes/products.js'
 import homeRoutes from './routes/home.js'
 
 dotenv.config() // to access environment variables from .env file
-const app = express()
+const app = express() // the actual express app
+app.use(cors()) // to allow the frontend to access the backend
 
 // routes
 app.use('/', homeRoutes)
