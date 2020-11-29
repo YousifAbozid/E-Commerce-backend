@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const schema = new mongoose.Schema({
+const reviewsSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -17,6 +17,4 @@ const schema = new mongoose.Schema({
     timestamps: true
 })
 
-const Reviews = mongoose.model('Reviews', schema)
-
-export default Reviews
+export default reviewsSchema
