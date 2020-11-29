@@ -1,10 +1,13 @@
-import products from '../data/products.js'
+import Product from '../models/product.js'
 
 export const getProducts = (request, response) => {
-    response.json(products)
+    Product.find({})
+        .then((data) => response.json(data))
+        .catch(() => response.status(404).json({ message: 'products not found' }))
 }
 
 export const getProduct = (request, response) => {
-    const product = products.find(p => p._id === request.params.id)
-    response.json(product)
+    Product.findById(request.params.id)
+        .then((data) => response.json(data))
+        .catch(() => response.status(404).json({ message: 'product not found' }))
 }
