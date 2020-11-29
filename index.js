@@ -2,6 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import mongoose from 'mongoose'
+import middleware from './utils/middleware.js'
 import productsRoutes from './routes/products.js'
 import homeRoutes from './routes/home.js'
 
@@ -22,6 +23,8 @@ mongoose.connect(process.env.CONNECTION_URL, {
 // routes
 app.use('/', homeRoutes)
 app.use('/api/products', productsRoutes)
+
+app.use(middleware.unknownEndpoint)
 
 const PORT = process.env.PORT || 5000
 
