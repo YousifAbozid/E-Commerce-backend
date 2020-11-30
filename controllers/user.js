@@ -1,7 +1,11 @@
 import bcrypt from 'bcryptjs'
-import generateToken from '../utils/generateToken.js'
+import jwt from 'jsonwebtoken'
+import asyncHandler from 'express-async-handler'
+import { generateToken, getTokenFrom } from '../utils/auth.js'
 import User from '../models/user.js'
 
+// description: to make the user login
+// route: POST api/users/login
 export const authUser = async (request, response) => {
     // first destructring email and password from the request body
     const { email, password } = request.body
@@ -31,3 +35,31 @@ export const authUser = async (request, response) => {
         token: generateToken(user._id)
     })
 }
+
+// description: to get user profile data
+// route: GET api/users/profile
+export const getUserProfile = asyncHandler(async (request, response) => {
+    // first extract the token from the request headers
+    const token = getTokenFrom(request)
+    
+    // then decode the token to know the user id
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+    
+    // if the token found and valid search for the user in the database by his/her id
+    const user = await User.findById(decodedToken.id).select('-password') // '-password' for exclude the password 
+
+    // if user found in the database return user data
+    if (user) {
+        response.json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+        })
+    } else {
+        // if user not found return status code 404 not found
+        response.status(404).json({ error: 'user not found' })
+    }
+})

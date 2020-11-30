@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import mongoose from 'mongoose'
-import middleware from './utils/middleware.js'
+import { errorHandler, unknownEndpoint } from './utils/middleware.js'
 import productsRoutes from './routes/products.js'
 import homeRoutes from './routes/home.js'
 import userRoutes from './routes/user.js'
@@ -27,7 +27,9 @@ app.use('/', homeRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/users', userRoutes)
 
-app.use(middleware.unknownEndpoint)
+// for middlewares
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 5000
 
