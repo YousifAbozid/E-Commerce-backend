@@ -63,3 +63,42 @@ export const getUserProfile = asyncHandler(async (request, response) => {
         response.status(404).json({ error: 'user not found' })
     }
 })
+
+// description: to add new user
+// route: POST api/users
+export const addUser = asyncHandler(async (request, response) => {
+    // first destructring name, email and password from the request body
+    const { name, email, password } = request.body
+    
+    // then search for the user by his/her email in the database
+    const userExist = await User.findOne({ email })
+
+    // if the user already registered return with status code 400 bad request
+    if (userExist) {
+        response.status(400).json({ error: 'user already registered' })
+    }
+
+    // if not then add new user to the database but first encrypt the password
+    const saltRounds = await bcrypt.genSalt(10) // this for generating salt rounds, check the docs from here: https://www.npmjs.com/package/bcryptjs
+    const passwordHash = await bcrypt.hash(password, saltRounds) // this create hash from password
+
+    const user = await User.create({
+        name,
+        email,
+        password: passwordHash
+    })
+
+    // checks if user created then send his/her data to the frontend
+    if (user) {
+        response.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            token: generateToken(user._id)
+        })
+    } else {
+        // if something went wrong return with status code 400 bas request
+        response.status(400).json({ error: 'invalid user data' })
+    }
+})
