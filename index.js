@@ -5,10 +5,12 @@ import mongoose from 'mongoose'
 import middleware from './utils/middleware.js'
 import productsRoutes from './routes/products.js'
 import homeRoutes from './routes/home.js'
+import userRoutes from './routes/user.js'
 
 dotenv.config() // to access environment variables from .env file
 const app = express() // the actual express app
 app.use(cors()) // to allow the frontend to access the backend
+app.use(express.json()) // to parse all incoming requests to json
 
 // connecting to MongoDB
 mongoose.connect(process.env.CONNECTION_URL, {
@@ -23,6 +25,7 @@ mongoose.connect(process.env.CONNECTION_URL, {
 // routes
 app.use('/', homeRoutes)
 app.use('/api/products', productsRoutes)
+app.use('/api/users', userRoutes)
 
 app.use(middleware.unknownEndpoint)
 
