@@ -58,7 +58,52 @@ export const getUserProfile = asyncHandler(async (request, response) => {
         })
     } else {
         // if user not found return status code 404 not found
-        response.status(404).json({ error: 'user not found' })
+        response.status(404).json({ error: 'User not found' })
+    }
+})
+
+// description: to update user profile data
+// route: PUT api/users/profile
+export const updateUserProfile = asyncHandler(async (request, response) => {
+    // first extract the token from the request headers
+    const token = getTokenFrom(request)
+
+    // destructure the data from the request body
+    const { name, email, password } = request.body
+    
+    // then decode the token to know the user id
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+    
+    // search for the user by his/her id because we will need his/her data
+    const userToUpdate = await User.findById(decodedToken.id)
+
+    // then generate salt rounds to hash the password, check the docs from here: https://www.npmjs.com/package/bcryptjs
+    const saltRounds = await bcrypt.genSalt(10)
+
+    // create an object with the data we want to update
+    const updatedInfo = {
+        name: name || userToUpdate.name,
+        email: email || userToUpdate.email,
+        password: password ? await bcrypt.hash(password, saltRounds) : userToUpdate.password
+    }
+
+    // then update the user data with the updated info
+    const updatedUser = await User.findByIdAndUpdate(decodedToken.id, updatedInfo, { new: true })
+
+    // if the user data updated successfully return with response his/her updated info
+    if (updatedUser) {
+        response.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            isAdmin: updatedUser.isAdmin,
+            token: generateToken(updatedUser._id)
+        })
+    } else {
+        // if can't update the user respond with status code 400 bad request 
+        response.status(400).json({ error: 'Can\'t update the user' })
     }
 })
 
