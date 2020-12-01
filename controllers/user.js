@@ -21,9 +21,7 @@ export const authUser = async (request, response) => {
 
     // if there is no user or the password incorrect return response with status code 401 unAuthorized
     if (!(user && passwordCorrect)) {
-        return response.status(401).json({
-        error: 'invalid username or password'
-        })
+        return response.status(401).json({ error: 'Invalid username or password' })
     }
 
     // if the email and password are correct return response with an object contain the user data
@@ -69,13 +67,15 @@ export const getUserProfile = asyncHandler(async (request, response) => {
 export const addUser = asyncHandler(async (request, response) => {
     // first destructring name, email and password from the request body
     const { name, email, password } = request.body
-    
-    // then search for the user by his/her email in the database
-    const userExist = await User.findOne({ email })
 
-    // if the user already registered return with status code 400 bad request
-    if (userExist) {
-        response.status(400).json({ error: 'user already registered' })
+    // checks if the name is provided in the request and at least 4 characters
+    if (name.length < 4) {
+        return response.status(400).json({error : "Name length is shorter than 4 characters"})
+    }
+
+    // checks if the password is provided in the request and at least 4 characters
+    if (password.length < 4) {
+        return response.status(400).json({error : "Password length is shorter than 4 characters"})
     }
 
     // if not then add new user to the database but first encrypt the password
