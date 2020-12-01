@@ -76,6 +76,16 @@ export const updateUserProfile = asyncHandler(async (request, response) => {
     // if the token is missing or invalid the code will stop exucting in the line above
     // and this generating an error, and errorHandler will respond with appropriate status code and error message
     
+    // checks if the name is provided in the request and at least 4 characters
+    if (name && name.length < 4) {
+        return response.status(400).json({error : "Name length is shorter than 4 characters"})
+    }
+
+    // checks if the password is provided in the request and at least 4 characters
+    if (password && password.length < 4) {
+        return response.status(400).json({error : "Password length is shorter than 4 characters"})
+    }
+    
     // search for the user by his/her id because we will need his/her data
     const userToUpdate = await User.findById(decodedToken.id)
 
@@ -116,6 +126,11 @@ export const addUser = asyncHandler(async (request, response) => {
     // checks if the name is provided in the request and at least 4 characters
     if (name.length < 4) {
         return response.status(400).json({error : "Name length is shorter than 4 characters"})
+    }
+
+    // checks if the email is provided
+    if (!email) {
+        return response.status(400).json({error : "Email should be provided"})
     }
 
     // checks if the password is provided in the request and at least 4 characters

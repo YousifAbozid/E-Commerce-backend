@@ -4,13 +4,13 @@ export const unknownEndpoint = (request, response) => {
 
 export const errorHandler = (error, request, response, next) => {
   if (error.name === 'JsonWebTokenError') {
-    return response.status(401).json({
-      error: 'token missing or invalid'
-    })
+    return response.status(401).json({ error: 'Token missing or invalid' })
   } else if (error.name === 'ValidationError' && error.errors.email.path === 'email') {
     return response.status(400).json({ error: 'This email is already registered' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
+  } else if (error.name === 'MongoError') {
+    return response.status(400).json({ error: 'This email is already exist, use different email' })
   }
 
   next(error)
