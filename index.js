@@ -6,6 +6,7 @@ import { errorHandler, unknownEndpoint } from './utils/middleware.js'
 import productsRoutes from './routes/products.js'
 import homeRoutes from './routes/home.js'
 import userRoutes from './routes/user.js'
+import orderRoutes from './routes/order.js'
 
 dotenv.config() // to access environment variables from .env file
 const app = express() // the actual express app
@@ -26,6 +27,7 @@ mongoose.connect(process.env.CONNECTION_URL, {
 app.use('/', homeRoutes)
 app.use('/api/products', productsRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/orders', orderRoutes)
 
 // for middlewares
 app.use(unknownEndpoint)
