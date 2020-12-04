@@ -71,3 +71,37 @@ export const getOrderById = asyncHandler(async (request, response) => {
         response.status(404)
     }
 })
+
+// description: update order to paid
+// route: PUT api/orders/:id/pay
+export const updateOrderToPaid = asyncHandler(async (request, response) => {
+    // get the token from the request
+    const token = getTokenFrom(request)
+
+    // then decode the token to know the user id, actulay I don't need it to search for the user
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+
+    // create an object with the data we want to update
+    const updatedInfo = {
+        isPaid: true,
+        paidAt: Date.now(),
+        paymentResult: {
+            id: request.body.id,
+            status: request.body.status,
+            update_time: request.body.update_time,
+            email_address: request.body.payer.email_address
+        }
+    }
+
+    // then update the order with the updated info
+    const updatedOrder = await Order.findByIdAndUpdate(request.params.id, updatedInfo, { new: true })
+
+    // if the order updated successfully return with the updated order info in the response 
+    if (updatedOrder) {
+        response.json(updatedOrder)
+    } else {
+        response.status(400).json({ error: 'Can\'t pay for the order' })
+    }
+})
