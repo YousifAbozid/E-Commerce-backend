@@ -105,3 +105,25 @@ export const updateOrderToPaid = asyncHandler(async (request, response) => {
         response.status(400).json({ error: 'Can\'t pay for the order' })
     }
 })
+
+// description: get logged in user orders
+// route: GET api/orders/myorders
+export const getMyOrders = asyncHandler(async (request, response) => {
+    // get the token from the request
+    const token = getTokenFrom(request)
+
+    // then decode the token to know the user id, actulay I don't need it to search for the user
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+
+    // search for the orders by the user id
+    const orders = await Order.find({ user: decodedToken.id })
+
+    // if there is an orders return with the orders info in the response 
+    if (orders) {
+        response.json(orders)
+    } else {
+        response.status(400).json({ error: 'Can\'t find any orders' })
+    }
+})
