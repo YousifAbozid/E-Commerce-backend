@@ -29,6 +29,9 @@ app.use('/api/products', productsRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/orders', orderRoutes)
 
+// route to get paypal client id, also it's to short so I'll put it here in one single line
+app.get('/api/config/paypal', (request, response) => response.send(process.env.PAYPAL_CLIENT_ID))
+
 // for middlewares
 app.use(unknownEndpoint)
 app.use(errorHandler)
