@@ -162,3 +162,34 @@ export const addUser = asyncHandler(async (request, response) => {
         response.status(400).json({ error: 'invalid user data' })
     }
 })
+
+// description: to get all users
+// route: GET api/users
+export const getUsers = asyncHandler(async (request, response) => {
+    // first extract the token from the request headers
+    const token = getTokenFrom(request)
+    
+    // then decode the token to know the user id
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+
+    // search for the user
+    const user = await User.findById(decodedToken.id)
+
+    // checks if the user is not an admin
+    if (!user.isAdmin) {
+        response.status(401).json({ error: 'Unauthorized, you are not an admin' })
+    } else {
+        //otherwise search for all the users in the database.
+        const users = await User.find({})
+    
+        // if users found in the database return users data
+        if (users) {
+            response.json(users)
+        } else {
+            // if users not found return status code 404 not found
+            response.status(404).json({ error: 'Users not found' })
+        }
+    }
+})
