@@ -12,7 +12,7 @@ export const errorHandler = (error, request, response, next) => {
   } else if (error.name === 'MongoError') {
     return response.status(400).json({ error: 'This email is already exist, use different email' })
   } else if (error.name === 'CastError' && error.kind === 'ObjectId') {
-    return response.status(404).send({ error: "Order not found" })
+    return response.status(404).send({ error: "Malformated ID" })
   }
 
   next(error)

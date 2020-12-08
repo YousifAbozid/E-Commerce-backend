@@ -68,7 +68,7 @@ export const getOrderById = asyncHandler(async (request, response) => {
     if (order) {
         response.json(order)
     } else {
-        response.status(404)
+        response.status(404).json({ error: 'Can\'t find that order' })
     }
 })
 

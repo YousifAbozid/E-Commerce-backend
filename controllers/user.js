@@ -224,3 +224,92 @@ export const deleteUser = asyncHandler(async (request, response) => {
         }
     }
 })
+
+// description: get user
+// route: GET api/users/:id
+export const getUserById = asyncHandler(async (request, response) => {
+    // first extract the token from the request headers
+    const token = getTokenFrom(request)
+    
+    // then decode the token to know the user id
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+
+    // search for the user
+    const user = await User.findById(decodedToken.id)
+
+    // checks if the user is not an admin
+    if (!user.isAdmin) {
+        response.status(401).json({ error: 'Unauthorized, you are not an admin' })
+    } else {
+        //otherwise search for the user in the database.
+        const user = await User.findById(request.params.id).select('-password')
+        
+        // if user deleted successfully
+        if (user) {
+            response.json(user)
+        } else {
+            // if users not found return status code 404 not found
+            response.status(404).json({ error: 'Can\'t find that user' })
+        }
+    }
+})
+
+// description: update user
+// route: PUT api/users/:id
+export const updateUser = asyncHandler(async (request, response) => {
+    // first extract the token from the request headers
+    const token = getTokenFrom(request)
+
+    // destructure the data from the request body
+    let { name, email, isAdmin } = request.body
+
+    // checks if the name is provided in the request and at least 4 characters
+    if (name && name.length < 4) {
+        return response.status(400).json({error : "Name length is shorter than 4 characters"})
+    }
+
+    // set isAdmin to false by default
+    if (!isAdmin) {
+        isAdmin = false
+    } 
+    
+    // then decode the token to know the user id
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+
+    // search for the user
+    const user = await User.findById(decodedToken.id)
+
+    // checks if the user is not an admin
+    if (!user.isAdmin) {
+        response.status(401).json({ error: 'Unauthorized, you are not an admin' })
+    } else {
+        // search for the user by his/her id because we will need his/her data
+        const userToUpdate = await User.findById(request.params.id)
+        
+        // create an object with the data we want to update
+        const updatedInfo = {
+            name: name || userToUpdate.name,
+            email: email || userToUpdate.email,
+            isAdmin
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(request.params.id, updatedInfo, { new: true })
+        
+        // if user updated successfully
+        if (updatedUser) {
+            response.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                isAdmin: updatedUser.isAdmin
+            })
+        } else {
+            // if user not found return status code 404 not found
+            response.status(404).json({ error: 'Can\'t update that user' })
+        }
+    }
+})
