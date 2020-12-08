@@ -193,3 +193,34 @@ export const getUsers = asyncHandler(async (request, response) => {
         }
     }
 })
+
+// description: delete user
+// route: DELETE api/users
+export const deleteUser = asyncHandler(async (request, response) => {
+    // first extract the token from the request headers
+    const token = getTokenFrom(request)
+    
+    // then decode the token to know the user id
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET)
+    // if the token is missing or invalid the code will stop exucting in the line above
+    // and this generating an error, and errorHandler will respond with appropriate status code and error message
+
+    // search for the user
+    const user = await User.findById(decodedToken.id)
+
+    // checks if the user is not an admin
+    if (!user.isAdmin) {
+        response.status(401).json({ error: 'Unauthorized, you are not an admin' })
+    } else {
+        //otherwise search for the user in the database and delete it
+        const deletedUser = await User.findByIdAndRemove(request.params.id)
+        
+        // if user deleted successfully
+        if (deletedUser) {
+            response.status(204).end()
+        } else {
+            // if users not found return status code 404 not found
+            response.status(404).json({ error: 'Can\'t delete that user, the user is not found or maybe has been deleted already!' })
+        }
+    }
+})
