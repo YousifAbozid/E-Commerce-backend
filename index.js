@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import morgan from 'morgan'
 import mongoose from 'mongoose'
 import { errorHandler, unknownEndpoint } from './utils/middleware.js'
 import productsRoutes from './routes/products.js'
@@ -12,6 +13,26 @@ dotenv.config() // to access environment variables from .env file
 const app = express() // the actual express app
 app.use(cors()) // to allow the frontend to access the backend
 app.use(express.json()) // to parse all incoming requests to json
+
+// ==> start using morgan logger
+// this is the tiny configuration for morgan how looks like in string below:
+// ":method :url :status :res[content-length] - :response-time ms"
+
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan(":method :url :status :res[content-length] - :response-time ms :POST-data"))
+    // also you can type morgan('dev') it will print something similar to that
+}
+
+/*
+to create a token write as follow :
+morgan.token('body', (req, res) => JSON.stringify(req.body))
+and without JSON.stringify() it will print [Object Object] , JSON.stringify() fixes that.
+for other resources visit : https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
+OR look at the original documentation for morgan here : https://github.com/expressjs/morgan#morgan
+*/
+morgan.token("POST-data", (req, res) => JSON.stringify(req.body))
+// ==> end using morgan logger
+
 
 // connecting to MongoDB
 mongoose.connect(process.env.CONNECTION_URL, {
