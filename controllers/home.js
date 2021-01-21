@@ -1,3 +1,3 @@
 export const getHome = (request, response) => {
-    response.send('API is running :)')
+    response.send("API is running :)")
 }

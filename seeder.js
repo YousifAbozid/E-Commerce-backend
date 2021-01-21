@@ -1,22 +1,25 @@
-import mongoose from 'mongoose'
-import dotenv from 'dotenv'
-import users from './data/users.js'
-import products from './data/products.js'
-import User from './models/user.js'
-import Product from './models/product.js'
-import Order from './models/order.js'
+import mongoose from "mongoose"
+import dotenv from "dotenv"
+import users from "./data/users.js"
+import products from "./data/products.js"
+import User from "./models/user.js"
+import Product from "./models/product.js"
+import Order from "./models/order.js"
 
 dotenv.config() // to access environment variables from .env file
 
 // connecting to MongoDB
-mongoose.connect(process.env.CONNECTION_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false 
+mongoose
+    .connect(process.env.CONNECTION_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        useFindAndModify: false,
     })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((error) => console.log(`Can't connect to MongoDB => ${error.message}`))
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((error) =>
+        console.log(`Can't connect to MongoDB => ${error.message}`)
+    )
 
 const importData = async () => {
     try {
@@ -39,7 +42,7 @@ const importData = async () => {
         // save all the products to the database
         await Product.insertMany(sampleProducts)
 
-        console.log('Data Imported Successfully!')
+        console.log("Data Imported Successfully!")
         process.exit()
     } catch (error) {
         console.log(error)
@@ -54,7 +57,7 @@ const destroyData = async () => {
         await Product.deleteMany()
         await Order.deleteMany()
 
-        console.log('Data Destroyed Successfully!')
+        console.log("Data Destroyed Successfully!")
         process.exit()
     } catch (error) {
         console.log(error)
@@ -62,7 +65,7 @@ const destroyData = async () => {
     }
 }
 
-if (process.argv[2] === '-d') {
+if (process.argv[2] === "-d") {
     destroyData()
 } else {
     importData()

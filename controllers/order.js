@@ -14,7 +14,7 @@ export const addOrderItem = asyncHandler(async (request, response) => {
         itemsPrice,
         taxPrice,
         shippingPrice,
-        totalPrice
+        totalPrice,
     } = request.body
 
     // get the token from the request
@@ -38,7 +38,7 @@ export const addOrderItem = asyncHandler(async (request, response) => {
             itemsPrice,
             taxPrice,
             shippingPrice,
-            totalPrice
+            totalPrice,
         })
 
         // if order saved successfully return the order object
@@ -46,7 +46,9 @@ export const addOrderItem = asyncHandler(async (request, response) => {
             return response.status(201).json(createdOrder)
         } else {
             // if not return an error
-            return response.status(400).json({ error: "Unable to create this order" })
+            return response
+                .status(400)
+                .json({ error: "Unable to create this order" })
         }
     }
 })
@@ -63,12 +65,15 @@ export const getOrderById = asyncHandler(async (request, response) => {
     // and this generating an error, and errorHandler will respond with appropriate status code and error message
 
     // you can check the docs to know more about populate: https://mongoosejs.com/docs/populate.html
-    const order = await Order.findById(request.params.id).populate("user", "name email")
+    const order = await Order.findById(request.params.id).populate(
+        "user",
+        "name email"
+    )
 
     if (order) {
         response.json(order)
     } else {
-        response.status(404).json({ error: 'Can\'t find that order' })
+        response.status(404).json({ error: "Can't find that order" })
     }
 })
 
@@ -91,18 +96,22 @@ export const updateOrderToPaid = asyncHandler(async (request, response) => {
             id: request.body.id,
             status: request.body.status,
             update_time: request.body.update_time,
-            email_address: request.body.payer.email_address
-        }
+            email_address: request.body.payer.email_address,
+        },
     }
 
     // then update the order with the updated info
-    const updatedOrder = await Order.findByIdAndUpdate(request.params.id, updatedInfo, { new: true })
+    const updatedOrder = await Order.findByIdAndUpdate(
+        request.params.id,
+        updatedInfo,
+        { new: true }
+    )
 
-    // if the order updated successfully return with the updated order info in the response 
+    // if the order updated successfully return with the updated order info in the response
     if (updatedOrder) {
         response.json(updatedOrder)
     } else {
-        response.status(400).json({ error: 'Can\'t pay for the order' })
+        response.status(400).json({ error: "Can't pay for the order" })
     }
 })
 
@@ -120,10 +129,10 @@ export const getMyOrders = asyncHandler(async (request, response) => {
     // search for the orders by the user id
     const orders = await Order.find({ user: decodedToken.id })
 
-    // if there is an orders return with the orders info in the response 
+    // if there is an orders return with the orders info in the response
     if (orders) {
         response.json(orders)
     } else {
-        response.status(400).json({ error: 'Can\'t find any orders' })
+        response.status(400).json({ error: "Can't find any orders" })
     }
 })
