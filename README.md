@@ -1,2 +1,3 @@
 # E-Commerce-backend
-E-Commerce-backend not finished yet :heart:
+
+E-Commerce-backend built with Nodejs, Expressjs and Mongodb :heart:
